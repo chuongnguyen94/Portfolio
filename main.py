@@ -16,7 +16,7 @@ import smtplib, string, random, os
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = "chuongabc"
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 Bootstrap5(app)
 ckeditor = CKEditor(app)
 
@@ -69,7 +69,7 @@ def load_user(user_id):
 class Base(DeclarativeBase):
     pass
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI",'sqlite:///blog.db')
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
