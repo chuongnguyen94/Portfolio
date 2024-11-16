@@ -1,0 +1,85 @@
+{% from 'bootstrap5/form.html' import render_form %}
+{% extends 'base.html' %}
+
+{% block styling %}
+.btn {
+  color: var(--contrast-color);
+  background: var(--accent-color);
+  border: 0;
+  padding: 10px 30px;
+  transition: 0.4s;
+  border-radius: 50px
+}
+
+.btn:hover {
+    background: color-mix(in srgb, var(--accent-color), transparent 25%)
+}
+{% endblock %}
+
+<body class="starter-page-page">
+  {% block content %}
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title dark-background">
+      <div class="container d-lg-flex justify-content-between align-items-center">
+        <h1 class="mb-2 mb-lg-0">Blog</h1>
+        <nav class="breadcrumbs">
+          <ol>
+            <li><a href="{{url_for('home')}}">Home</a></li>
+            <li class="current">Blog</li>
+          </ol>
+        </nav>
+      </div>
+    </div><!-- End Page Title -->
+
+    <!-- Starter Section Section -->
+    <section id="starter-section" class="starter-section section">
+
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <div class="row">
+          <div class="col-lg-8 mx-auto" style="padding: 0 0px">
+            <h2>Blog</h2>
+            <p>A collection of random musings.</p>
+          </div>
+        </div>
+      </div><!-- End Section Title -->
+
+      {% for post in posts:%}
+      <div class="container" data-aos="fade-up">
+        <div class="row">
+          <div class="p-4 p-md-5 mb-4 col-lg-8 mx-auto rounded text-body-emphasis bg-body-secondary">
+            <h2 class="display-8 fst-italic">{{post.title}}
+              <!-- Only show delete button if user_id = 1 -->
+              {% if current_user.id == 1:%}
+                <a href="{{url_for('delete', post_id=post.id)}}">✘</a>
+              {% endif %}
+            </h2>
+
+            <p class="lead my-3">{{post.subtitle}}</p>
+            <p class="lead mb-0"><a href="{{url_for('post', post_id=post.id)}}" class="text-body-emphasis fw-bold">Continue reading...</a></p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+      {% if current_user.id == 1: %}
+      <div class="container" data-aos="fade-up">
+        <div class="row">
+          <div class="col-lg-8 mx-auto" style="padding: 0 0px">
+            <a href="{{url_for('create_new_post')}}">
+              <button class="btn btn-primary d-inline-flex align-items-center" type="button">
+                Create New Post
+              </button>
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </section><!-- /Starter Section Section -->
+
+  </main>
+  {% endblock %}
+
+</body>

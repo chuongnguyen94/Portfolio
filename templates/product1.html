@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block styling %}
+.portfolio-description > p {
+  text-align: justify;
+}
+{% endblock %}
+
+<body class="portfolio-details-page">
+  {% block content %}
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title dark-background">
+      <div class="container d-lg-flex justify-content-between align-items-center">
+        <h1 class="mb-2 mb-lg-0">Portfolio Details</h1>
+        <nav class="breadcrumbs">
+          <ol>
+            <li><a href="index.html">Home</a></li>
+            <li class="current">Portfolio Details</li>
+          </ol>
+        </nav>
+      </div>
+    </div><!-- End Page Title -->
+
+    <!-- Portfolio Details Section -->
+    <section id="portfolio-details" class="portfolio-details section">
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row gy-4">
+
+          <div class="col-lg-8">
+            <div class="portfolio-details-slider swiper init-swiper">
+
+              <script type="application/json" class="swiper-config">
+                {
+                  "loop": true,
+                  "speed": 600,
+                  "autoplay": {
+                    "delay": 5000
+                  },
+                  "slidesPerView": "auto",
+                  "pagination": {
+                    "el": ".swiper-pagination",
+                    "type": "bullets",
+                    "clickable": true
+                  }
+                }
+              </script>
+
+              <div class="swiper-wrapper align-items-center">
+
+                <div class="swiper-slide">
+                  <img src="static/assets/img/portfolio/livestock.jpg" alt="">
+                </div>
+
+                <div class="swiper-slide">
+                  <img src="static/assets/img/portfolio/livestock-1.png" alt="">
+                </div>
+
+                <div class="swiper-slide">
+                  <img src="static/assets/img/portfolio/livestock-2.png" alt="">
+                </div>
+
+                <div class="swiper-slide">
+                  <img src="static/assets/img/portfolio/livestock-3.png" alt="">
+                </div>
+
+                <div class="swiper-slide">
+                  <img src="static/assets/img/portfolio/livestock-4.png" alt="">
+                </div>
+
+                <div class="swiper-slide">
+                  <img src="static/assets/img/portfolio/livestock-5.png" alt="">
+                </div>
+
+              </div>
+              <div class="swiper-pagination"></div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="portfolio-info" data-aos="fade-up" data-aos-delay="200">
+              <h3>Project information</h3>
+              <ul>
+                <li><strong>Category</strong>: IoT</li>
+                <li><strong>Purpose</strong>: Thesis graduation</li>
+                <li><strong>Project duration</strong>: December 2023 - May 2024</li>
+                <li><strong>Project URL</strong>: <a href="https://environment-reading.web.app/">https://environment-reading.web.app/</a></li>
+              </ul>
+            </div>
+            <div class="portfolio-description" data-aos="fade-up" data-aos-delay="300">
+              <h2>Abstract</h2>
+              <p>
+                With the continuous development of science and technology, applying advanced technological techniques to agriculture in general and animal husbandry in particular has become more urgent than ever, especially in the field of livestock farming. However, with a long-standing agricultural tradition like in Vietnam, integrating technology into an area that traditionally relies on generations of experience is not as common and effective. There have been some domestic studies on using technology to monitor animal behavior, but there has been no research focusing on building a smart livestock farming system. Based on this issue, we conducted research and developed a livestock farming management system using IoT as the topic for our graduation thesis. The topic utilizes various sensors to collect information on environmental temperature and related indices of the animals, helping farmers to detect early signs of health issues in animals, and the system is capable of responding promptly to unfavorable weather conditions, thus ensuring the animals are always healthy, contributing to the success of the farm. In addition, the animal identification method used in the study helps farmers effectively control and manage their livestock pens. The results show that the system operates relatively stable and serves as a basis for further development in future projects.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section><!-- /Portfolio Details Section -->
+
+  </main>
+  {% endblock %}

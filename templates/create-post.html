@@ -1,0 +1,67 @@
+{% from 'bootstrap5/form.html' import render_form %}
+{% extends 'base.html' %}
+
+{% block styling %}
+.btn {
+  color: var(--contrast-color);
+  background: var(--accent-color);
+  border: 0;
+  padding: 10px 30px;
+  transition: 0.4s;
+  border-radius: 50px
+}
+
+.btn:hover {
+    background: color-mix(in srgb, var(--accent-color), transparent 25%)
+}
+{% endblock %}
+
+<body class="starter-page-page">
+  {% block content %}
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title dark-background">
+      <div class="container d-lg-flex justify-content-between align-items-center">
+        <h1 class="mb-2 mb-lg-0">Create New Post</h1>
+        <nav class="breadcrumbs">
+          <ol>
+            <li><a href="{{url_for('home')}}">Home</a></li>
+            <li class="current">Create New Post</li>
+          </ol>
+        </nav>
+      </div>
+    </div><!-- End Page Title -->
+
+    <!-- Starter Section Section -->
+    <section id="starter-section" class="starter-section section">
+
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <div class="row">
+          <div class="col-lg-6 mx-auto">
+            {% if not is_edit: %}
+            <h2>New Post</h2>
+            <p>You're going to make a great blog post!</p>
+            {% else: %}
+            <h2>{{post.title}}</h2>
+            {% endif %}
+          </div>
+        </div>
+      </div><!-- End Section Title -->
+
+      <div class="container" data-aos="fade-up">
+        <div class="row">
+          <div class="col-lg-6 mx-auto">
+            {{ckeditor.load()}}
+            {{render_form(form, novalidate=True)}}
+          </div>
+        </div>
+      </div>
+
+    </section><!-- /Starter Section Section -->
+
+  </main>
+  {% endblock %}
+
+</body>
