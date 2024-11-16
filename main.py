@@ -12,7 +12,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, Text
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import date
-import smtplib, string, random, os
+import smtplib, string, random, os, email_validator
 
 
 app = Flask(__name__)
