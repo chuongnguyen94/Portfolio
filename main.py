@@ -12,7 +12,10 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, Text
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import date
-import smtplib, string, random, os
+import smtplib, string, random, os, time
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from openai import OpenAI
 
 
 app = Flask(__name__)
@@ -29,6 +32,48 @@ gravatar = Gravatar(app,
                     force_lower=False,
                     use_ssl=False,
                     base_url=None)
+
+#IELTS-BRO SCRAPPING
+class Field:
+    def __init__(self, field, topics):
+        self.field = field
+        self.topics = topics
+def web_scrapping():
+    topics = []
+    driver = webdriver.Chrome()
+    driver.get('https://next.ieltsbro.com/forecast/')
+    sections = driver.find_elements(By.CLASS_NAME, 'adm-tabs-tab-wrapper')
+
+    for section in sections:
+        # Reading section
+        if section.text == '口语':
+            section.click()
+            for _ in range(5):
+                footer = driver.find_element(By.CLASS_NAME, 'adm-infinite-scroll')
+                footer.click()
+                time.sleep(3)
+            fields = driver.find_elements(By.CLASS_NAME, 'sc-hknPuZ')
+            for field in fields:
+                field.click()
+            time.sleep(1)
+            result = driver.find_elements(By.CLASS_NAME, 'kzAlbd')
+            for each in result:
+                topics.append(each.text)
+    driver.quit()
+    return topics
+
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+client = OpenAI(
+        api_key=OPENAI_API_KEY)
+
+def chatgpt(prompt):
+    stream = client.chat.completions.create(
+        model="gpt-4",
+        messages=[{"role": "user", "content": f"{prompt}. Use some of the WH-questions to give me some ideas to answer, list out 2 sections: one section is WH-questions and some sugguestions in phrases and words; another section is 3 examples answered the question, each example has 4-6 sentences. Add each line into a <p> HTML tag, title should have tag <h5>, bold the WH-questions."}],
+        stream=False,
+    )
+    return stream.choices[0].message.content
+
 
 #SEND-EMAIL CONTACT
 def send_email(name, email, subject, message):
@@ -106,6 +151,12 @@ class Comment(db.Model):
     post_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("blog_posts.id"))
     parent_post = relationship("BlogPost", back_populates="comment")
 
+class SpeakingEnglish(db.Model):
+    __tablename__ = "speaking"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    topic: Mapped[str] = mapped_column(String(300), nullable=False)
+    solution: Mapped[str] = mapped_column(Text, nullable=False)
+
 with app.app_context():
     db.create_all()
 class LoginForm(FlaskForm):
@@ -146,6 +197,13 @@ class ContactForm(FlaskForm):
     message = TextAreaField("Message", validators=[DataRequired()])
     send = SubmitField("Send Message")
 
+class TopicForm(FlaskForm):
+    question = StringField("Question", validators=[DataRequired()])
+    solution = CKEditorField("Solutions", validators=[DataRequired()])
+    submit = SubmitField("Submit Topic")
+
+class GenerateButton(FlaskForm):
+    generate = SubmitField('Generate Data')
 @app.route('/')
 def home():
     return render_template('index.html', current_user=current_user)
@@ -198,7 +256,7 @@ def login():
                 if(check_password_hash(user.password, form.password.data)):
                     login_user(user)
                     print(current_user.is_authenticated)
-                    return redirect(url_for('show_all_posts'))
+                    return redirect(url_for('home'))
                 else:
                     flash("Wrong password, please try again.")
                     return redirect(url_for('login'))
@@ -374,5 +432,52 @@ def send_message():
         send_email(name, email, subject, message)
         return render_template('index.html', )
     return render_template('index.html', current_user=current_user)
+
+class Topic:
+    def __init__(self, topic, solution):
+        self.topic = topic
+        self.solution = solution
+@app.route('/resources', methods=['GET', 'POST'])
+def resources():
+    topic_data = db.session.execute(db.select(SpeakingEnglish)).scalars()
+    form = GenerateButton()
+    if form.validate_on_submit():
+        obj_list = []
+        topics_bank = web_scrapping()
+        time.sleep(22)
+        for topic in topics_bank[:3]:
+            solution = chatgpt(topic)
+            obj_list.append(Topic(topic, solution))
+        if not obj_list == []:
+            for obj in obj_list:
+                new_record = SpeakingEnglish(
+                    topic=obj.topic,
+                    solution=obj.solution,
+                )
+                db.session.add(new_record)
+                db.session.commit()
+        return redirect(url_for('resources'))
+    return render_template('resources.html', form=form, objects=topic_data, current_user=current_user)
+
+@app.route('/resources-part-1-<int:topic_id>')
+def resource_detail(topic_id):
+    requested_topic = db.get_or_404(SpeakingEnglish, topic_id)
+    return render_template('resource-detail.html', topic=requested_topic, current_user=current_user)
+
+@app.route('/edit-resource-<int:topic_id>', methods=['GET','POST'])
+@admin_only
+def edit_resource(topic_id):
+    requested_topic = db.get_or_404(SpeakingEnglish, topic_id)
+    form = TopicForm(
+        question=requested_topic.topic,
+        solution=requested_topic.solution,
+    )
+    if form.validate_on_submit():
+        requested_topic.topic = form.question.data
+        requested_topic.solution = form.solution.data
+        db.session.commit()
+        return redirect(url_for('resources'))
+    return render_template('create-topic.html', form=form, is_edit=True, topic=requested_topic, current_user=current_user)
+
 if __name__ == "__main__":
     app.run(debug=True)

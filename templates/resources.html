@@ -1,0 +1,89 @@
+{% from 'bootstrap5/form.html' import render_form %}
+{% extends 'base.html' %}
+
+{% block styling %}
+.btn {
+  color: var(--contrast-color);
+  background: var(--accent-color);
+  border: 0;
+  padding: 10px 30px;
+  transition: 0.4s;
+  border-radius: 50px
+}
+
+.btn:hover {
+    background: color-mix(in srgb, var(--accent-color), transparent 25%)
+}
+{% endblock %}
+
+<body class="starter-page-page">
+  {% block content %}
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title dark-background">
+      <div class="container d-lg-flex justify-content-between align-items-center">
+        <h1 class="mb-2 mb-lg-0">Resources</h1>
+        <nav class="breadcrumbs">
+          <ol>
+            <li><a href="{{url_for('home')}}">Home</a></li>
+            <li class="current">Resources</li>
+          </ol>
+        </nav>
+      </div>
+    </div><!-- End Page Title -->
+
+    <!-- Starter Section Section -->
+    <section id="starter-section" class="starter-section section">
+
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <div class="row">
+          <div class="col-lg-8 mx-auto" style="padding: 0 0px">
+            <h2>Resources</h2>
+            <p>A chest of knowledge.</p>
+          </div>
+        </div>
+      </div><!-- End Section Title -->
+
+      {% if current_user.id == 1: %}
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 mx-auto p-0 my-5">
+            {{render_form(form)}}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+<!--      <div class="container" data-aos="fade-up">-->
+<!--        <div class="row">-->
+<!--          <div class="p-4 p-md-5 mb-4 col-lg-8 mx-auto rounded text-body-emphasis bg-body-secondary">-->
+<!--            <h2 class="display-8 fst-italic">-->
+<!--              What kind of advertising do you like?-->
+
+<!--              &lt;!&ndash; Only show delete button if user_id = 1 &ndash;&gt;-->
+<!--            </h2>-->
+
+<!--            <p class="lead my-3">-->
+<!--            1. What types of advertising engage you? - "I favour advertisements that are engaging, creative and straight to the point." 2. Where do you usually encounter the advertisements that grasp your attention? - "The advertisements that really grab my attention are mostly encountered on social media platforms or billboards across the city." 3. Who are the people or companies that create the advertisements you like? - "Most of the advertisements I like are created by renowned marketing agencies or big tech companies like Google and Apple." 4. When do you usually pay attention to advertisements? - "I usually pay attention to advertisements during my leisure time, especially when I browse the internet or watch TV." 5. Why do certain types of advertising appeal to you? - "Advertisements that have a clear and compelling message with a touch of humor tend to appeal to me more." 6. Which type of advertisements — print, radio, television, or digital — do you prefer? - "I prefer digital advertisements because they can be interactive and more personalized to my preferences." 7. How do you feel about targeted advertisements? - "I feel indifferent about targeted advertisements, sometimes they can be useful in bringing products to my attention that I was unaware of and other times they can feel intrusive." 8. What features make advertising effective for you? - "For me, effective advertising should be enticing, informative, and memorable." Example sentences: 1. "I appreciate advertisements that are innovative and tell a story, making me feel connected to the brand." 2. "The advertisements I like normally come from startups who are trying something new and bold." 3. "I'm intrigued by advertisements that manage to convey their message in a powerful and minimalistic way." 4. "Advertisements from charities that raise awareness for some cause usually leave a strong impression on me." 5. "Advertisers who can incorporate humor intelligently into their adverts definitely win my interest."-->
+<!--            </p>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+
+      {% for obj in objects:%}
+      <div class="container" data-aos="fade-up">
+        <div class="row">
+          <div class="p-4 p-md-0 mb-4 col-lg-8 mx-auto rounded text-body-emphasis">
+            <h5 class="display-8 fst-italic"><a href="{{url_for('resource_detail', topic_id=obj.id)}}">{{obj.id}}. {{obj.topic}}</a></h5>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </section><!-- /Starter Section Section -->
+
+  </main>
+  {% endblock %}
+
+</body>
