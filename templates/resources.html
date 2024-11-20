@@ -39,7 +39,7 @@
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
         <div class="row">
-          <div class="col-lg-8 mx-auto" style="padding: 0 0px">
+          <div class="col-lg-8 mx-auto">
             <h2>Resources</h2>
             <p>A chest of knowledge.</p>
           </div>
@@ -49,12 +49,13 @@
       {% if current_user.id == 1: %}
       <div class="container">
         <div class="row">
-          <div class="col-lg-8 mx-auto p-0 my-5">
-            {{render_form(form)}}
+          <div class="col-lg-8 mx-auto pb-4">
+            {{render_form(generate_button)}}
           </div>
         </div>
       </div>
       {% endif %}
+
 
 <!--      <div class="container" data-aos="fade-up">-->
 <!--        <div class="row">-->
@@ -75,13 +76,14 @@
       {% for obj in objects:%}
       <div class="container" data-aos="fade-up">
         <div class="row">
-          <div class="p-4 p-md-0 mb-4 col-lg-8 mx-auto rounded text-body-emphasis">
+          <div class="col-lg-8 mx-auto rounded text-body-emphasis">
             <h5 class="display-8 fst-italic"><a href="{{url_for('resource_detail', topic_id=obj.id)}}">{{obj.id}}. {{obj.topic}}</a></h5>
           </div>
         </div>
       </div>
       {% endfor %}
     </section><!-- /Starter Section Section -->
+
 
   </main>
   {% endblock %}

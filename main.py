@@ -12,9 +12,14 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, Text
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import date
-import smtplib, string, random, os, time
+import smtplib, string, random, os, time, csv, pandas
+import undetected_chromedriver as uc
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
+
+
 from openai import OpenAI
 
 
@@ -40,8 +45,19 @@ class Field:
         self.topics = topics
 def web_scrapping():
     topics = []
-    driver = webdriver.Chrome()
+    # driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+    # driver = webdriver.Chrome("/Users/cnn/Desktop/untitled folder/Workspace/Python/Chuong-portfolio/chromedriver")
+    # driver = webdriver.Chrome()  # Optional argument, if not specified will search path.
+
+    options = webdriver.ChromeOptions()
+    options.binary_location = "/usr/bin/google-chrome"
+    driver = uc.Chrome(version_main=130)
+
+
+    # driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager(version="90.0.4430.24").install()))
+
     driver.get('https://next.ieltsbro.com/forecast/')
+    time.sleep(2)
     sections = driver.find_elements(By.CLASS_NAME, 'adm-tabs-tab-wrapper')
 
     for section in sections:
@@ -59,8 +75,9 @@ def web_scrapping():
             result = driver.find_elements(By.CLASS_NAME, 'kzAlbd')
             for each in result:
                 topics.append(each.text)
-    driver.quit()
+            driver.quit()
     return topics
+
 
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 client = OpenAI(
@@ -204,6 +221,10 @@ class TopicForm(FlaskForm):
 
 class GenerateButton(FlaskForm):
     generate = SubmitField('Generate Data')
+
+class GetChatGPTButton(FlaskForm):
+    get = SubmitField('Get ChatGPT')
+
 @app.route('/')
 def home():
     return render_template('index.html', current_user=current_user)
@@ -440,12 +461,27 @@ class Topic:
 @app.route('/resources', methods=['GET', 'POST'])
 def resources():
     topic_data = db.session.execute(db.select(SpeakingEnglish)).scalars()
-    form = GenerateButton()
-    if form.validate_on_submit():
-        obj_list = []
+    generate_data = GenerateButton()
+    if generate_data.validate_on_submit():
         topics_bank = web_scrapping()
-        time.sleep(22)
-        for topic in topics_bank[:3]:
+        with open('static/assets/files/speaking-part-one.csv', 'a', newline='') as data_file:
+            writer = csv.writer(data_file)
+            writer.writerow(topics_bank)
+
+        return redirect(url_for('resources'))
+    return render_template('resources.html', generate_button=generate_data, objects=topic_data, current_user=current_user)
+
+@app.route('/test', methods=['GET','POST'])
+@admin_only
+def test():
+    get_chat_gpt = GetChatGPTButton()
+    topics_list = []
+    file = pandas.read_csv('static/assets/files/speaking-part-one.csv').to_dict()
+    for each in file:
+        topics_list.append(each)
+    if get_chat_gpt.validate_on_submit():
+        obj_list = []
+        for topic in topics_list[:3]:
             solution = chatgpt(topic)
             obj_list.append(Topic(topic, solution))
         if not obj_list == []:
@@ -457,7 +493,8 @@ def resources():
                 db.session.add(new_record)
                 db.session.commit()
         return redirect(url_for('resources'))
-    return render_template('resources.html', form=form, objects=topic_data, current_user=current_user)
+    return render_template('test.html', current_user=current_user, get_chat_button=get_chat_gpt, list=topics_list)
+
 
 @app.route('/resources-part-1-<int:topic_id>')
 def resource_detail(topic_id):

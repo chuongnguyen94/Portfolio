@@ -38,8 +38,8 @@
 
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
-        <div class="row">
-          <div class="col-lg-8 mx-auto" style="padding: 0 0px">
+        <div class="row gy-4">
+          <div class=" col-lg-8 mx-auto">
             <h2>Blog</h2>
             <p>A collection of random musings.</p>
           </div>
@@ -48,8 +48,8 @@
 
       {% for post in posts:%}
       <div class="container" data-aos="fade-up">
-        <div class="row">
-          <div class="p-4 p-md-5 mb-4 col-lg-8 mx-auto rounded text-body-emphasis bg-body-secondary">
+        <div class="row gy-4" style="padding: 0 12px;">
+          <div class="p-3 p-md-5 mb-4 col-lg-8 mx-auto rounded text-body-emphasis bg-body-secondary">
             <h2 class="display-8 fst-italic">{{post.title}}
               <!-- Only show delete button if user_id = 1 -->
               {% if current_user.id == 1:%}
@@ -66,8 +66,8 @@
 
       {% if current_user.id == 1: %}
       <div class="container" data-aos="fade-up">
-        <div class="row">
-          <div class="col-lg-8 mx-auto" style="padding: 0 0px">
+        <div class="row gy-4">
+          <div class="col-lg-8 mx-auto">
             <a href="{{url_for('create_new_post')}}">
               <button class="btn btn-primary d-inline-flex align-items-center" type="button">
                 Create New Post
