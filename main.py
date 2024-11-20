@@ -481,7 +481,7 @@ def test():
         topics_list.append(each)
     if get_chat_gpt.validate_on_submit():
         obj_list = []
-        for topic in topics_list[:3]:
+        for topic in topics_list[:1]:
             solution = chatgpt(topic)
             obj_list.append(Topic(topic, solution))
         if not obj_list == []:
