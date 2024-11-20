@@ -469,7 +469,16 @@ def resources():
             writer.writerow(topics_bank)
 
         return redirect(url_for('resources'))
-    return render_template('resources.html', generate_button=generate_data, objects=topic_data, current_user=current_user)
+    return render_template('resources.html', generate_button=generate_data, topics=topic_data, current_user=current_user)
+
+@app.route('/delete_topic<int:topic_id>')
+@login_required
+@admin_only
+def delete_topic(topic_id):
+    requested_topic = db.get_or_404(SpeakingEnglish, topic_id)
+    db.session.delete(requested_topic)
+    db.session.commit()
+    return redirect(url_for('resources'))
 
 @app.route('/test', methods=['GET','POST'])
 @admin_only
@@ -481,7 +490,7 @@ def test():
         topics_list.append(each)
     if get_chat_gpt.validate_on_submit():
         obj_list = []
-        for topic in topics_list[:1]:
+        for topic in topics_list[:3]:
             solution = chatgpt(topic)
             obj_list.append(Topic(topic, solution))
         if not obj_list == []:

@@ -73,11 +73,15 @@
 <!--        </div>-->
 <!--      </div>-->
 
-      {% for obj in objects:%}
+      {% for topic in topics:%}
       <div class="container" data-aos="fade-up">
         <div class="row">
           <div class="col-lg-8 mx-auto rounded text-body-emphasis">
-            <h5 class="display-8 fst-italic"><a href="{{url_for('resource_detail', topic_id=obj.id)}}">{{obj.id}}. {{obj.topic}}</a></h5>
+            <h5 class="display-8 fst-italic"><a href="{{url_for('resource_detail', topic_id=topic.id)}}">{{topic.id}}. {{topic.topic}}</a>
+            {% if current_user.id == 1:%}
+              <a href="{{url_for('delete_topic', topic_id=topic.id)}}">✘</a>
+            {% endif %}
+            </h5>
           </div>
         </div>
       </div>
