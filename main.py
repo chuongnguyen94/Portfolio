@@ -488,8 +488,10 @@ def write_to_csv():
     get_chat_gpt = GetChatGPTButton()
     topics_list = []
     file = pandas.read_csv('static/assets/files/speaking-part-one.csv').to_dict()
+    text = "Do you know any of your neighbours?"
     for each in file:
         topics_list.append(each)
+    print(topics_list.index(text))
     if get_chat_gpt.validate_on_submit():
         topics = []
         solutions = []
