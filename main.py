@@ -266,7 +266,7 @@ def contact():
 
 @app.route('/product1')
 def product1():
-    return render_template('product1.html')
+    return render_template('product1.html', is_not_home=True)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -339,7 +339,7 @@ def forgot_password():
         else:
             flash(f"Cannot find email {form.email.data}.")
             return redirect(url_for('forgot_password'))
-    return render_template('forgot-password.html', form=form, current_user=current_user)
+    return render_template('forgot-password.html', form=form, current_user=current_user, is_not_home=True)
 
 @app.route('/change-password', methods=['GET', 'POST'])
 def change_password():
@@ -361,7 +361,7 @@ def change_password():
             else:
                 flash(f'Cannot find email {form.email.data}')
                 return redirect(url_for('change_password'))
-        return render_template('change-password.html', form=form, current_user=current_user)
+        return render_template('change-password.html', form=form, current_user=current_user, is_not_home=True)
     else:
         return redirect(url_for('home'))
 
@@ -407,7 +407,7 @@ def create_new_post():
         db.session.add(new_post)
         db.session.commit()
         return redirect(url_for('show_all_posts'))
-    return render_template('create-post.html', form=form)
+    return render_template('create-post.html', form=form, is_not_home=True)
 
 @app.route('/delete<int:post_id>')
 @login_required
@@ -439,7 +439,7 @@ def edit(post_id):
 
 @app.route('/edit-resume')
 def edit_resume():
-    return render_template('create-resume.html', current_user=current_user)
+    return render_template('create-resume.html', current_user=current_user, is_not_home=True)
 
 @app.route('/logout')
 def logout():
@@ -471,7 +471,7 @@ def resources():
             writer = csv.writer(data_file)
             writer.writerow(topics_bank)
         return redirect(url_for('write_to_csv'))
-    return render_template('resources.html', generate_button=generate_data, topics=topic_data, current_user=current_user)
+    return render_template('resources.html', generate_button=generate_data, topics=topic_data, current_user=current_user, is_not_home=True)
 
 @app.route('/delete_topic<int:topic_id>')
 @login_required
@@ -507,7 +507,7 @@ def write_to_csv():
             }
             pandas.DataFrame(data_dict).to_csv('static/assets/files/solution-speaking-part-one.csv', index=False)
         return redirect(url_for('write_to_db'))
-    return render_template('write-to-csv.html', current_user=current_user, get_chat_button=get_chat_gpt, list=topics_list)
+    return render_template('write-to-csv.html', current_user=current_user, get_chat_button=get_chat_gpt, list=topics_list, is_not_home=True)
 
 @app.route('/write-to-db', methods=['GET','POST'])
 @admin_only
@@ -526,11 +526,11 @@ def write_to_db():
                 db.session.add(new_record)
                 db.session.commit()
         return redirect(url_for('resources'))
-    return render_template('write-to-db.html', form=form, current_user=current_user)
+    return render_template('write-to-db.html', form=form, current_user=current_user, is_not_home=True)
 @app.route('/resources-part-1-<int:topic_id>')
 def resource_detail(topic_id):
     requested_topic = db.get_or_404(SpeakingEnglish, topic_id)
-    return render_template('resource-detail.html', topic=requested_topic, current_user=current_user)
+    return render_template('resource-detail.html', topic=requested_topic, current_user=current_user, is_not_home=True)
 
 @app.route('/edit-resource-<int:topic_id>', methods=['GET','POST'])
 @admin_only
@@ -545,7 +545,7 @@ def edit_resource(topic_id):
         requested_topic.solution = form.solution.data
         db.session.commit()
         return redirect(url_for('resources'))
-    return render_template('create-topic.html', form=form, is_edit=True, topic=requested_topic, current_user=current_user)
+    return render_template('create-topic.html', form=form, is_edit=True, topic=requested_topic, current_user=current_user, is_not_home=True)
 
 if __name__ == "__main__":
     app.run(debug=True)
