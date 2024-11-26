@@ -516,10 +516,10 @@ def write_to_db():
     if form.validate_on_submit():
         if not data_to_db == []:
             for obj in data_to_db:
-                print(obj['topic'])
+                print(obj['topics'])
                 new_record = SpeakingEnglish(
-                    topic=obj['topic'],
-                    solution=obj['solution'],
+                    topic=obj['topics'],
+                    solution=obj['solutions'],
                 )
                 db.session.add(new_record)
                 db.session.commit()
