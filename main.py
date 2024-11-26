@@ -225,6 +225,9 @@ class GenerateButton(FlaskForm):
 class GetChatGPTButton(FlaskForm):
     get = SubmitField('Get ChatGPT')
 
+class WriteToDBButton(FlaskForm):
+    write = SubmitField("Write To Database")
+
 @app.route('/')
 def home():
     return render_template('index.html', current_user=current_user)
@@ -467,8 +470,7 @@ def resources():
         with open('static/assets/files/speaking-part-one.csv', 'a', newline='') as data_file:
             writer = csv.writer(data_file)
             writer.writerow(topics_bank)
-
-        return redirect(url_for('resources'))
+        return redirect(url_for('write_to_csv'))
     return render_template('resources.html', generate_button=generate_data, topics=topic_data, current_user=current_user)
 
 @app.route('/delete_topic<int:topic_id>')
@@ -480,31 +482,49 @@ def delete_topic(topic_id):
     db.session.commit()
     return redirect(url_for('resources'))
 
-@app.route('/test', methods=['GET','POST'])
+@app.route('/write-to-csv', methods=['GET','POST'])
 @admin_only
-def test():
+def write_to_csv():
     get_chat_gpt = GetChatGPTButton()
     topics_list = []
     file = pandas.read_csv('static/assets/files/speaking-part-one.csv').to_dict()
     for each in file:
         topics_list.append(each)
     if get_chat_gpt.validate_on_submit():
-        obj_list = []
-        for topic in topics_list[:3]:
+        topics = []
+        solutions = []
+        for topic in topics_list[:2]:
             solution = chatgpt(topic)
-            obj_list.append(Topic(topic, solution))
-        if not obj_list == []:
-            for obj in obj_list:
+            topics.append(topic)
+            solutions.append(solution)
+
+            #Write solutions to CSV
+            data_dict = {
+                "topic": topics,
+                "solution": solutions
+            }
+            pandas.DataFrame(data_dict).to_csv('static/assets/files/solution-speaking-part-one.csv', index=False)
+        return redirect(url_for('write_to_db'))
+    return render_template('write-to-csv.html', current_user=current_user, get_chat_button=get_chat_gpt, list=topics_list)
+
+@app.route('/write-to-db', methods=['GET','POST'])
+@admin_only
+def write_to_db():
+    form = WriteToDBButton()
+    # Read solutions from CSV
+    data_to_db = pandas.read_csv('static/assets/files/solution-speaking-part-one.csv').to_dict(orient='records')
+    if form.validate_on_submit():
+        if not data_to_db == []:
+            for obj in data_to_db:
+                print(obj['topic'])
                 new_record = SpeakingEnglish(
-                    topic=obj.topic,
-                    solution=obj.solution,
+                    topic=obj['topic'],
+                    solution=obj['solution'],
                 )
                 db.session.add(new_record)
                 db.session.commit()
         return redirect(url_for('resources'))
-    return render_template('test.html', current_user=current_user, get_chat_button=get_chat_gpt, list=topics_list)
-
-
+    return render_template('write-to-db.html', form=form, current_user=current_user)
 @app.route('/resources-part-1-<int:topic_id>')
 def resource_detail(topic_id):
     requested_topic = db.get_or_404(SpeakingEnglish, topic_id)
