@@ -43,6 +43,15 @@
             <h2>Resources</h2>
             <p>A chest of knowledge.</p>
           </div>
+          <div class="col-lg-8 mx-auto mt-2">
+            {% with messages = get_flashed_messages() %}
+              {% if messages: %}
+                {% for message in messages: %}
+                  <span style="color:red">{{message}}</span>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+          </div>
         </div>
       </div><!-- End Section Title -->
 
@@ -81,6 +90,7 @@
             {% if current_user.id == 1:%}
               <a href="{{url_for('delete_topic', topic_id=topic.id)}}">✘</a>
             {% endif %}
+              <a href="{{url_for('add_learning_list', topic_id=topic.id)}}"><i class="bi bi-folder-plus"></i></a>
             </h5>
           </div>
         </div>

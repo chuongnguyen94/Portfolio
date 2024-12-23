@@ -1,0 +1,60 @@
+{% from 'bootstrap5/form.html' import render_form %}
+{% extends 'base.html' %}
+
+{% block styling %}
+.btn {
+  color: var(--contrast-color);
+  background: var(--accent-color);
+  border: 0;
+  padding: 10px 30px;
+  transition: 0.4s;
+  border-radius: 50px
+}
+
+.btn:hover {
+    background: color-mix(in srgb, var(--accent-color), transparent 25%)
+}
+{% endblock %}
+
+<body class="starter-page-page">
+  {% block content %}
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title dark-background">
+      <div class="container d-lg-flex justify-content-between align-items-center">
+        <h1 class="mb-2 mb-lg-0">Learning List</h1>
+        <nav class="breadcrumbs">
+          <ol>
+            <li><a href="{{url_for('home')}}">Home</a></li>
+            <li class="current">Learning List</li>
+          </ol>
+        </nav>
+      </div>
+    </div><!-- End Page Title -->
+
+    <!-- Starter Section Section -->
+    <section id="starter-section" class="starter-section section">
+
+    <!-- Blog Section -->
+    <section id="service-details" class="service-details section">
+      <div class="container col-lg-8 d-lg-flex justify-content-between align-items-center">
+        <div class="card mx-auto" >
+          <div class="card-body mx-auto">
+            <h5 class="card-title">{{clock}}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            <a href="#" class="card-link">Card link</a>
+            <a href="#" class="card-link">Another link</a>
+          </div>
+        </div>
+      </div>
+    </section><!-- /Post Section -->
+
+
+    </section><!-- /Starter Section Section -->
+
+  </main>
+  {% endblock %}
+
+</body>

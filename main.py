@@ -144,6 +144,8 @@ class User(UserMixin, db.Model):
     post = relationship('BlogPost', back_populates='author')
     comment = relationship("Comment", back_populates='author_comment')
 
+    speaking_part_one_list_id: Mapped[str] = mapped_column(String(500), nullable=True)
+
 class BlogPost(db.Model):
     __tablename__ = "blog_posts"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -173,6 +175,7 @@ class SpeakingEnglish(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     topic: Mapped[str] = mapped_column(String(300), nullable=False)
     solution: Mapped[str] = mapped_column(Text, nullable=False)
+
 
 with app.app_context():
     db.create_all()
@@ -249,7 +252,7 @@ def download_resume():
     if not current_user.is_authenticated:
         flash('You need to login to download my CV :)')
         return redirect(url_for('login'))
-    return send_from_directory('static', path='assets/files/ChuongCV-Dec.pdf')
+    return send_from_directory('static', path='assets/files/CV_ChuongNguyen.pdf')
 
 @app.route('/portfolio')
 def portfolio():
@@ -546,6 +549,90 @@ def edit_resource(topic_id):
         db.session.commit()
         return redirect(url_for('resources'))
     return render_template('create-topic.html', form=form, is_edit=True, topic=requested_topic, current_user=current_user, is_not_home=True)
+
+@app.route('/add-learning-list-<int:topic_id>', methods=['GET','POST'])
+def add_learning_list(topic_id):
+    if not current_user.is_authenticated:
+        flash('You need to login to use this function')
+        return redirect(url_for('login'))
+    else:
+        requested_topic = db.get_or_404(SpeakingEnglish, topic_id)
+        user = db.session.execute(db.select(User).where(User.id == current_user.id)).scalar()
+        topic_id_string = user.speaking_part_one_list_id
+        topic_choice = requested_topic.id
+        if topic_id_string:
+            topic_list = topic_id_string.split(", ")
+            topic_list = [int(num) for num in topic_list]
+            if not topic_choice in topic_list:
+                topic_list.append(topic_choice)
+                print(topic_list)
+                topic_list.sort()
+                print(topic_list)
+                topic_list = [str(num) for num in topic_list]
+                topic_string = ", ".join(topic_list)
+                user.speaking_part_one_list_id = topic_string
+                db.session.commit()
+            else:
+                flash('Already in your learning list.')
+        else:
+            user.speaking_part_one_list_id = topic_choice
+            db.session.commit()
+        return redirect(url_for('resources'))
+
+class TopicWithID:
+    def __init__(self, id, topic, solution):
+        self.id = id
+        self.topic = topic
+        self.solution = solution
+@app.route('/speaking-part-one-learning-list', methods=['GET', 'POST'])
+@login_required
+def speaking_part_one_learning_list():
+    user = db.session.execute(db.select(User).where(User.id == current_user.id)).scalar()
+    topic_id_string = user.speaking_part_one_list_id
+    if topic_id_string:
+        topic_id_list = topic_id_string.split(", ")
+        topic_id_list = [int(each) for each in topic_id_list]
+        topic_object_list = []
+        for each in topic_id_list:
+            topic = db.get_or_404(SpeakingEnglish, each)
+            topic_object = TopicWithID(topic.id, topic.topic, topic.solution)
+            topic_object_list.append(topic_object)
+        return render_template('speaking-part-one-learning-list.html', topic_list=topic_object_list, current_user=current_user, is_not_home=True)
+    else:
+        return render_template('speaking-part-one-learning-list.html', topic_list=[], current_user=current_user, is_not_home=True)
+
+
+@app.route('/delete-topic-learning-list-<int:topic_id>')
+@login_required
+def delete_topic_learning_list(topic_id):
+    user = db.session.execute(db.select(User).where(User.id == current_user.id)).scalar()
+    topic_id_string = user.speaking_part_one_list_id
+    topic_id_list = topic_id_string.split(", ")
+    for each in topic_id_list:
+        if topic_id == int(each):
+            topic_id_list.remove(each)
+    if topic_id_list != []:
+        topic_string = ", ".join(topic_id_list)
+        user.speaking_part_one_list_id = topic_string
+    else:
+        user.speaking_part_one_list_id = ''
+    db.session.commit()
+    return redirect(url_for('speaking_part_one_learning_list'))
+
+@app.route('/practice-speaking')
+@login_required
+def practice_speaking():
+    user = db.session.execute(db.select(User).where(User.id == current_user.id)).scalar()
+    topic_id_string = user.speaking_part_one_list_id
+    topic_id_list = topic_id_string.split(", ")
+    topic_id_list = [int(each) for each in topic_id_list]
+    return render_template('practice-speaking.html', current_user=current_user, is_not_home=True)
+# @app.route('/count-down')
+# def countdown():
+#     for i in range(10):
+#         clock = i
+#         time.sleep(1)
+#     return redirect(url_for('practice_speaking', clock=clock))
 
 if __name__ == "__main__":
     app.run(debug=True)

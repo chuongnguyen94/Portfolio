@@ -51,6 +51,7 @@
 
     <div class="social-links text-center">
 <!--      <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>-->
+      <a href="https://github.com/chuongnguyen94" class="github"><i class="bi bi-github"></i></a>
       <a href="https://www.facebook.com/cnn1211/" class="facebook"><i class="bi bi-facebook"></i></a>
 <!--      <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>-->
 <!--      <a href="#" class="google-plus"><i class="bi bi-skype"></i></a>-->
@@ -128,6 +129,8 @@
           <strong>{{current_user.name}}</strong>
         </a>
         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" style="--bs-dropdown-zindex: 9999;">
+          <li><a class="dropdown-item" href="{{url_for('speaking_part_one_learning_list')}}">Learning List</a></li>
+          <li><hr class="dropdown-divider"></li>
           <li><a class="dropdown-item" href="{{url_for('change_password')}}">Change Password</a></li>
           <li><hr class="dropdown-divider"></li>
           <li><a class="dropdown-item" href="{{url_for('logout')}}">Sign out</a></li>
