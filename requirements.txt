@@ -12,6 +12,5 @@ gunicorn==21.2.0
 psycopg2-binary==2.9.9
 pandas==2.2.3
 openai==1.55.3
-httpx==0.27.2
 undetected-chromedriver==3.5.5
 webdriver-manager==4.0.2
